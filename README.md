@@ -5,6 +5,10 @@
 This project provides the structure to run virtual robot combats.
 Robots can be controlled manually (with the [ManualRobot]() class) or automated (with the [AutomatedRobot]() class).
 
+It requires the following Python packages:
+* pygame
+* numpy
+
  ## Combat rules
  
  Estas reglas habría que programarlas en una clase superior que gestione un torneo.
