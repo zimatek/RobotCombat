@@ -4,7 +4,7 @@ from manual_robot import ManualRobot
 from automated_robot import AutomatedRobot
 from automated_robots.automated_robot_idle import IdleRobot
 from automated_robots.automated_robot_random import RandomRobot
-# Here you should import the your AutomatedRobot class
+# Here you should import the your AutomatedRobot
 from robot_hub import RobotHub
 from coin import Coin
 import numpy as np
@@ -63,6 +63,7 @@ class Combat:
         self.coin_per_second = coin_per_second
 
         self.font = None
+        self.font2 = None
 
     def fix_bugs(self):
         """
@@ -89,6 +90,7 @@ class Combat:
         pygame.init()
         pygame.font.init()
         self.font = pygame.font.Font("Resources/Pokemon_Classic.ttf", 16)
+        self.font2 = pygame.font.Font("Resources/Pokemon_Classic.ttf", 28)
 
         background_image = pygame.image.load("Resources/background_mountains.jpg")
         background_image = pygame.transform.rotozoom(background_image, 0, 2.5)
@@ -109,6 +111,7 @@ class Combat:
         coins = pygame.sprite.Group()
         stop = False
         pause = False
+        winner = None
 
         sprites_all.add(self.robots)
         sprites_all.add(projectiles)
@@ -116,6 +119,7 @@ class Combat:
         clock = pygame.time.Clock()
 
         time = 1
+        count_down = 60*3
         totalcoins = 0
 
         # -------- Principal Loop of the Program -----------
@@ -127,6 +131,12 @@ class Combat:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         pause = not pause
+                    if event.key == pygame.K_1:
+                        pause = True
+                        winner = 1
+                    if event.key == pygame.K_0:
+                        pause = True
+                        winner = 0
 
                 if isinstance(self.left_robot, ManualRobot) and self.left_robot.living:
                     projectile = self.left_robot.decide(event, self.left_robot_hub)
@@ -205,11 +215,31 @@ class Combat:
                                          (0, 0, 0))
             screen.blit(coin_text, (self.dims[0] - 5 - coin_text.get_width(), 5 + coin_text.get_height()))
 
+            if self.left_robot.living and not self.right_robot.living:
+                winner = 1
+                pause = True
+            if not self.left_robot.living and self.right_robot.living:
+                winner = 0
+                pause = True
+
             if pause:
-                pause_text = self.font.render("Paused", False, (0, 0, 0))
-                center = (self.dims[0] // 2, self.dims[1] // 2)
-                text_rect = pause_text.get_rect(center=center)
-                screen.blit(pause_text, text_rect)
+                if winner == 1:
+                    pause_text = self.font2.render(
+                        "The winner is {:s}".format(str(type(self.left_robot)).split(".")[-1][:-2]), False, (0, 0, 0))
+                    center = (self.dims[0] // 2, self.dims[1] // 2)
+                    text_rect = pause_text.get_rect(center=center)
+                    screen.blit(pause_text, text_rect)
+                elif winner == 0:
+                    pause_text = self.font2.render(
+                        "The winner is {:s}".format(str(type(self.right_robot)).split(".")[-1][:-2]), False, (0, 0, 0))
+                    center = (self.dims[0] // 2, self.dims[1] // 2)
+                    text_rect = pause_text.get_rect(center=center)
+                    screen.blit(pause_text, text_rect)
+                else:
+                    pause_text = self.font.render("Paused", False, (0, 0, 0))
+                    center = (self.dims[0] // 2, self.dims[1] // 2)
+                    text_rect = pause_text.get_rect(center=center)
+                    screen.blit(pause_text, text_rect)
             else:
                 time += 1
 
@@ -223,16 +253,16 @@ class Combat:
 if __name__ == '__main__':
     attributes = {
         "health": 500,
-        "armor": 70,
+        "armor": 90,
         "health_regen": 19,
         "damage": 65,
-        "self_speed": 2,
+        "self_speed": 3,
         "projectile_initial_speed": 4,
         "projectile_per_second": 0.6,
-        "g_health": 100,
+        "g_health": 80,
         "g_armor": 8,
         "g_health_regen": 2,
-        "g_damage": 8,
+        "g_damage": 12,
         "g_projectile_per_second": 0.05,
         "max_self_speed": 5,
         "max_projectile_initial_speed": 10,
@@ -240,7 +270,7 @@ if __name__ == '__main__':
         "g_experience_for_level_up": 3
     }
 
-    cps = 0.5
+    cps = 2
 
     bots = pygame.sprite.Group()
     bot1 = ManualRobot(x=150, y=325, **attributes)
