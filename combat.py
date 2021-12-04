@@ -2,9 +2,8 @@ import pygame
 from robot import Robot
 from manual_robot import ManualRobot
 from automated_robot import AutomatedRobot
-from automated_robots.automated_robot_idle import IdleRobot
-from automated_robots.automated_robot_random import RandomRobot
-# Here you should import the your AutomatedRobot
+from automated_robots.robots_concursantes import *
+from automated_robots.robots_zimatek import *
 from robot_hub import RobotHub
 from coin import Coin
 import numpy as np
@@ -131,6 +130,7 @@ class Combat:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         pause = not pause
+                        winner = None
                     if event.key == pygame.K_1:
                         pause = True
                         winner = 1
@@ -151,7 +151,7 @@ class Combat:
                         projectiles.add(projectile)
 
             # --- The Logic
-            if not pause:
+            if not pause and (time > count_down):
                 np.random.shuffle(self.robot_list)
                 for robot in self.robot_list:
                     if robot == self.left_robot:
@@ -215,6 +215,21 @@ class Combat:
                                          (0, 0, 0))
             screen.blit(coin_text, (self.dims[0] - 5 - coin_text.get_width(), 5 + coin_text.get_height()))
 
+            # Only for zimabot
+            if (isinstance(self.left_robot, Zimabot) or isinstance(self.right_robot, Zimabot)):
+                if isinstance(self.left_robot, Zimabot):
+                    zimabot = self.left_robot
+                    other = self.right_robot
+                else:
+                    zimabot = self.right_robot
+                    other = self.left_robot
+
+                if time < count_down or (zimabot.living and not other.living):
+                    belt_image = pygame.image.load("Resources/cinturon.png").convert_alpha()
+                    belt_image = pygame.transform.scale(belt_image, (2*zimabot.width, 2*zimabot.height))
+                    screen.blit(belt_image, zimabot.pos - np.array([zimabot.width//2, int(zimabot.height*1.5)]))
+            # ----
+
             if self.left_robot.living and not self.right_robot.living:
                 winner = 1
                 pause = True
@@ -224,14 +239,12 @@ class Combat:
 
             if pause:
                 if winner == 1:
-                    pause_text = self.font2.render(
-                        "The winner is {:s}".format(str(type(self.left_robot)).split(".")[-1][:-2]), False, (0, 0, 0))
+                    pause_text = self.font2.render("The winner is {:s}".format(str(type(self.left_robot)).split(".")[-1][:-2]), False, (0, 0, 0))
                     center = (self.dims[0] // 2, self.dims[1] // 2)
                     text_rect = pause_text.get_rect(center=center)
                     screen.blit(pause_text, text_rect)
                 elif winner == 0:
-                    pause_text = self.font2.render(
-                        "The winner is {:s}".format(str(type(self.right_robot)).split(".")[-1][:-2]), False, (0, 0, 0))
+                    pause_text = self.font2.render("The winner is {:s}".format(str(type(self.right_robot)).split(".")[-1][:-2]), False, (0, 0, 0))
                     center = (self.dims[0] // 2, self.dims[1] // 2)
                     text_rect = pause_text.get_rect(center=center)
                     screen.blit(pause_text, text_rect)
@@ -246,7 +259,6 @@ class Combat:
             pygame.display.flip()
 
             clock.tick(60)
-
         pygame.quit()
 
 
@@ -273,9 +285,11 @@ if __name__ == '__main__':
     cps = 2
 
     bots = pygame.sprite.Group()
-    bot1 = ManualRobot(x=150, y=325, **attributes)
-    bot2 = RandomRobot(x=1050-150-4*32, y=325, turn_left=True,
-                      projectile_color=(38, 162, 149), image_path="Resources/simple_robot_green.png",
-                      **attributes)
+    bot1 = stalin_t_pose(x=150, y=325, **attributes)
+
+    bot2 = Zimabot(x=1050-150-4*32, y=325, turn_left=True,
+                   projectile_color=(38, 162, 149), image_path="Resources/simple_robot_green.png",
+                   **attributes)
+
     mg = Combat(bot1, bot2, coin_per_second=cps)
     mg.run()

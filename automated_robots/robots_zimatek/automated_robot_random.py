@@ -1,4 +1,3 @@
-import pygame
 from automated_robot import AutomatedRobot
 from numpy import random
 import numpy as np
