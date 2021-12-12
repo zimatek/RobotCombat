@@ -134,6 +134,10 @@ class Robot(pygame.sprite.Sprite):
         return self.__image
 
     @property
+    def image_path(self):
+        return self.__image_path
+
+    @property
     def width(self):
         return self.__width
 
@@ -362,6 +366,10 @@ class Robot(pygame.sprite.Sprite):
                                 speed=self.__projectile_initial_speed)
         self.__time_since_attack = 0
         return projectile
+
+    def update_image(self, image_path):
+        self.__image_path = image_path
+        self.set_up()
 
     def update(self, combat):
         """

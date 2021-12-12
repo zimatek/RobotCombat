@@ -121,16 +121,15 @@ class Zimabot(AutomatedRobot):
             self.__attack_time += 1
             if not self.__angry:
                 if self.__inner_time % 30 < 25:
-                    self.image_path = "Resources/zimabot/zimabot_1.png"
+                    self.update_image("Resources/zimabot/zimabot_1.png")
                 else:
-                    self.image_path = "Resources/zimabot/zimabot_7.png"
+                    self.update_image("Resources/zimabot/zimabot_7.png")
             else:
-                self.image_path = "Resources/zimabot/zimabot_4.png"
+                self.update_image("Resources/zimabot/zimabot_4.png")
         if other_robot_properties["health"] <= self.damage * (1-other_robot_properties["armor"] / (100 + other_robot_properties["armor"])):
-            self.image_path = "Resources/zimabot/zimabot_3.png"
+            self.update_image("Resources/zimabot/zimabot_3.png")
         if self.experience <= 4 and self.level >= 3:
-            self.image_path = "Resources/zimabot/zimabot_3.png"
-        self.set_up()
+            self.update_image("Resources/zimabot/zimabot_3.png")
 
         # Randomly decide what to upgrade
         self.decide_upgrade()
@@ -148,9 +147,8 @@ class Zimabot(AutomatedRobot):
             proj = self.decide_cast_attack(other_robot_properties)
             if proj is not None:
                 if self.image_path == "Resources/zimabot/zimabot_6.png":
-                    self.image_path = "Resources/zimabot/zimabot_5.png"
+                    self.update_image("Resources/zimabot/zimabot_5.png")
                 else:
-                    self.image_path = "Resources/zimabot/zimabot_6.png"
-                self.set_up()
+                    self.update_image("Resources/zimabot/zimabot_6.png")
                 self.__attack_time = 0
                 return proj
