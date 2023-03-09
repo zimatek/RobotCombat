@@ -8,3 +8,5 @@ Robots can be controlled manually (with the [ManualRobot]() class) or automated 
 It requires the following Python packages:
 * pygame
 * numpy
+
+**IMPORTANT: READ 'Reglas de la competicion.pdf'**
